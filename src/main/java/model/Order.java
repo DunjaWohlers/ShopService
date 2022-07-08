@@ -48,7 +48,6 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Id='" + orderId + ' ' +
-                ", p:" + products;
+        return  "" + products;
     }
 }

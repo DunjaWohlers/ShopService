@@ -34,8 +34,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "name='" + name + '\'' +
-                ", id='" + id;
+        return "" + name + "(" + id +")";
     }
 
     @Override

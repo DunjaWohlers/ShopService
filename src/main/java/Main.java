@@ -4,7 +4,6 @@ import model.Order;
 import model.Product;
 import service.ShopService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -39,8 +38,24 @@ public class Main {
                 idCounter++;
                 Product product = service.getProduct(id2);
                 service.addOrder(new Order("" + idCounter, Map.of(product.getId(), product)));
-                System.out.println(service.listorder());
             }
+            case "3" ->{
+                System.out.println("============================================");
+                repo.getProductList().values().forEach(System.out::println);
+                System.out.println("============================================");
+            }
+            case "4" ->{
+                System.out.println("Bisherige Aufträge:");
+
+                if(service.listorder().size()==0){
+                    System.out.println("Keine Aufträge vorhanden");
+                }else {
+                    service.listorder().forEach((k, v) -> {
+                        System.out.println(v);
+                    });
+                }
+            }
+
         }
     }
 
@@ -49,8 +64,7 @@ public class Main {
         System.out.println("1 Produkt anlegen");
         System.out.println("2 Bestellung aufgeben");
         System.out.println("3 Alle Produkte anzeigen");
-        System.out.println("4 Ein Produkt anzeigen");
-        System.out.println("5 Alle Aufträge anzeigen");
+        System.out.println("4 Alle Aufträge anzeigen");
     }
 
 
@@ -61,6 +75,7 @@ public class Main {
     }
 
     private static OrderRepo createOrderRepo(ProductRepo repo) {
+        Order orderNull=new Order();
         Order order1 = new Order("O1", repo.getProductList());
         Order order2 = new Order("O2", repo.getProductList());
         Order order3 = new Order("O3", repo.getProductList());
@@ -68,7 +83,7 @@ public class Main {
         System.out.println(order1);
 
         OrderRepo orderRepo = new OrderRepo();
-        orderRepo.add(order1);
+       // orderRepo.add(orderNull);
         return orderRepo;
     }
 
