@@ -29,13 +29,13 @@ class ProduktTest {
         Order order3 = new Order("O3", repo.getProductList());
 
         System.out.println(order1);
-//
+        //
         OrderRepo orderRepo = new OrderRepo();
         orderRepo.add(order1);
         System.out.println(orderRepo);
         System.out.println("Shop Service");
         ShopService service = new ShopService(repo, orderRepo);
-//
+        //
         System.out.println(service.getProduct("1"));
 
         service.addOrder(order2);

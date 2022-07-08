@@ -5,7 +5,8 @@ import db.ProductRepo;
 import model.Order;
 import model.Product;
 
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ShopService {
    ProductRepo productRepo;
@@ -15,6 +16,11 @@ public class ShopService {
     public ShopService(ProductRepo productRepo, OrderRepo orderRepo) {
         this.productRepo = productRepo;
         this.orderRepo = orderRepo;
+    }
+
+    public void addProduct(String id, String productName){
+       Product product = new Product(id, productName);
+       productRepo.add(product);
     }
 
     public Product getProduct( String id){
@@ -30,15 +36,13 @@ public class ShopService {
     public Order getOrder(String auftragsNummer){
             return orderRepo.getOrders().get(auftragsNummer);
     }
-
-    public Map<String,Product> listProducts(){
-       return productRepo.getProductList();
+    public List<Product> listProducts(){
+       return new ArrayList<>(productRepo.getProductList().values());
     }
 
     public Map<String,Order> listorder(){
        return orderRepo.getOrders();
     }
-
 
     public ProductRepo getProductRepo() {
         return productRepo;
