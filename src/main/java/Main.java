@@ -2,104 +2,99 @@ import db.OrderRepo;
 import db.ProductRepo;
 import model.Order;
 import model.Product;
-import service.ShopService;
 
-import java.util.Map;
 import java.util.Scanner;
-
 
 public class Main {
 
 
-    public static void main(String[] args) {
-        int idCounter=0;
-        welcomeMessage();
-        ProductRepo repo = createProducts();
-        OrderRepo orderRepo = createOrderRepo(repo);
-        ShopService service = new ShopService(repo, orderRepo);
+    public  static void main(String[] args) {
+        ProductRepo repo = new ProductRepo();
+        OrderRepo orders=new OrderRepo();
+        abfrage(repo,orders);
+    }
 
-        String input1= scannerInput();
+    private static void welcomeMessage(String user) {
+        System.out.println("Willkommen, " + user);
+        System.out.println("Bitte wähle eine der Optionen:");
+        System.out.println("1 Neues Produkt anlegen");
+        System.out.println("2 Bestellung aufgeben");
+        System.out.println("3 Benutzer wechseln");
+        System.out.println("e exit");
+    }
 
-        switch (input1) {
-            case "1" -> {
-                System.out.println("Gib den Namen des Produktes ein:");
-                String name = scannerInput();
-                System.out.println("Gib die ID des Produktes ein:");
-                String id = scannerInput();
-                service.addProduct(name, id);
-            }
-            // System.out.println(service.getProductRepo());
-            case "2" -> {
-                System.out.println("============================================");
-                repo.getProductList().values().forEach(System.out::println);
-                System.out.println("============================================");
-                System.out.println("Gib die Id des gewünschten Produktes ein:");
-                String id2 = scannerInput();
-                idCounter++;
-                Product product = service.getProduct(id2);
-                service.addOrder(new Order("" + idCounter, Map.of(product.getId(), product)));
-            }
-            case "3" ->{
-                System.out.println("============================================");
-                repo.getProductList().values().forEach(System.out::println);
-                System.out.println("============================================");
-            }
-            case "4" ->{
-                System.out.println("Bisherige Aufträge:");
+    private  static void abfrage(ProductRepo repo, OrderRepo orders) {
+        System.out.println("Bitte gib deinen Benutzernamen an:");
+        String userName=scannerInput();
 
-                if(service.listorder().size()==0){
-                    System.out.println("Keine Aufträge vorhanden");
-                }else {
-                    service.listorder().forEach((k, v) -> {
-                        System.out.println(v);
-                    });
+        welcomeMessage(userName);
+       // ShopService service = new ShopService(repo, orderRepo);
+        String wahlInput = scannerInput();
+
+        switch (wahlInput) {
+            case "1":
+                createProduct(repo);
+                abfrage(repo,orders);
+                break;
+            case "2":
+                System.out.println("Möchtest du die Waren deiner aktuellen Bestellung hinzufügen? y/n");
+                String input=scannerInput();
+                if (input.equals("y")) {
+                    if(orderIdCounter==0){
+                        System.out.println("Du hast noch keine Bestellung ausgeführt, eine neue wird angelegt.");
+                        addProductToNewOrder(orders, repo,userName);
+                    }else {
+                        addProdouctToExistingOrder(orders, repo);
+                    }
+                }else{
+                    System.out.println("Die Waren werden einer neuen Bestellung hinzugefügt...");
+                    addProductToNewOrder(orders, repo,userName);
                 }
-            }
-
+                abfrage(repo,orders);
+                break;
+            default:
+                abfrage(repo,orders);
         }
     }
 
-    private static void welcomeMessage(){
-        System.out.println("Bitte wähle eine der Optionen:");
-        System.out.println("1 Produkt anlegen");
-        System.out.println("2 Bestellung aufgeben");
-        System.out.println("3 Alle Produkte anzeigen");
-        System.out.println("4 Alle Aufträge anzeigen");
-    }
-
-
     private static String scannerInput() {
-
-        Scanner scan= new Scanner(System.in);
+        Scanner scan = new Scanner(System.in);
         return scan.nextLine();
     }
 
-    private static OrderRepo createOrderRepo(ProductRepo repo) {
-        Order orderNull=new Order();
-        Order order1 = new Order("O1", repo.getProductList());
-        Order order2 = new Order("O2", repo.getProductList());
-        Order order3 = new Order("O3", repo.getProductList());
 
-        System.out.println(order1);
-
-        OrderRepo orderRepo = new OrderRepo();
-       // orderRepo.add(orderNull);
-        return orderRepo;
+    static void createProduct(ProductRepo repo) {
+        System.out.println("Gib den Namen des Produktes ein:");
+        String name = scannerInput();
+        System.out.println("Gib die ID des Produktes ein:");
+        String id = scannerInput();
+        repo.addProduct(new Product(id, name));
     }
 
-    public static ProductRepo createProducts(){
-        Product product1 = new Product("Samsung", "1");
-        Product product2 = new Product("iPhone", "2");
-        Product product3 = new Product("Nokia", "3");
-        ProductRepo repo=new ProductRepo(
-                //Map.of(product1.id,product1,product2.id,product2)
-        );
-        repo.getProductList().put(product1.getId(),product1);
-        repo.getProductList().put(product2.getId(),product2);
-        repo.getProductList().put(product3.getId(),product3);
-
-        return repo;
+    static void addProdouctToExistingOrder( OrderRepo orderDb, ProductRepo repo) {
+        System.out.println(repo.getProductsAsString());
+        String orderID=""+orderIdCounter;
+        System.out.println("Gib die ID des gewünschten Produktes ein:");
+        String id = scannerInput();
+        Product chosenProduct=repo.getProductById(id);
+        orderDb.addProductToExistingOrder(chosenProduct, orderID);
     }
 
+    static int orderIdCounter=0;
+    static void addProductToNewOrder(OrderRepo orderDb, ProductRepo repo, String user) {
+        orderIdCounter++;
+        System.out.println(repo.getProductsAsString());
+        String orderID=""+orderIdCounter;
+        System.out.println("Gib die ID des gewünschten Produktes ein:");
+        String id = scannerInput();
+        System.out.println(repo.getProductById(id));
+        Product chosenProduct=repo.getProductById(id);
+        Order order=new Order(user,orderID, chosenProduct);
+        System.out.println(order);
+        orderDb.addOrder(order);//Neuen Order erstellen
+        orderDb.addProductToExistingOrder(chosenProduct,orderID); //Product einfügen
+        System.out.println(orderDb.getOrdersAsString());
 
-}
+    }
+
+    }

@@ -1,48 +1,34 @@
 package db;
 
 import model.Order;
+import model.Product;
 
 import java.util.*;
 
 public class OrderRepo {
-    Map<String,Order> orders = new HashMap<>();
+    Map<String,Order> orders;
 
-    public OrderRepo() {
+    public OrderRepo(){
+        this.orders = new HashMap<>();
     }
 
-    public OrderRepo(HashMap<String, Order> orders) {
-        this.orders = orders;
+    int idCounter=0;
+    public void addOrder(Order order){
+        //idCounter++;
+        // id="OrderNr."+idCounter;
+        this.orders.put(order.getOrderID(), order);
     }
 
-    public void add(Order order){
-        this.orders.put(order.getOrderId(),order);
+
+
+    public void addProductToExistingOrder(Product product, String orderID){
+
+        orders.get(orderID).addProduct(product);
     }
 
 
-    public Map<String, Order> getOrders() {
-        return orders;
+    public  String getOrdersAsString(){
+        return this.orders.toString();
     }
 
-    public void setOrders(Map<String, Order> orders) {
-        this.orders = orders;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderRepo:" + orders +
-                ' ';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrderRepo orderRepo = (OrderRepo) o;
-        return Objects.equals(orders, orderRepo.orders);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(orders);
-    }
 }

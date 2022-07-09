@@ -1,53 +1,33 @@
 package model;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
 public class Order {
-    String orderId;
-    Map<String, Product> products;
+    String orderID;
+    Map<String, Product> productMap;
 
-    public Order() {
+    String user;
+
+    public Order(String userName, String id, Product product) {
+        this.user = userName;
+        this.orderID = id;
+        this.productMap = new HashMap<>();
+        addProduct(product);
     }
 
-    public Order(String orderId, Map<String,Product> products) {
-        this.orderId = orderId;
-        this.products = products;
+    public void addProduct(Product product) {
+        this.productMap.put(product.id, product);
     }
 
-
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    public Map<String, Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(Map<String, Product> products) {
-        this.products = products;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
-        return Objects.equals(orderId, order.orderId) && Objects.equals(products, order.products);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(orderId, products);
+    public String getOrderID() {
+        return orderID;
     }
 
     @Override
     public String toString() {
-        return  "" + products;
+        return "" + orderID + ": " + productMap.values() +"("+ user + ')';
     }
 }

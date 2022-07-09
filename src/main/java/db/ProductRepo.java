@@ -6,28 +6,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProductRepo {
-    Map<String, Product> productList = new HashMap<>();
-    public ProductRepo(){
+    Map<String, Product> productList;
+
+
+    public ProductRepo() {
+        this.productList = new HashMap<>();
+
+        String[] productNames={"iPhone","Nokia","BabypandaPhone", "iAlpakka", "iSteak"};
+        int counter=0;
+        for(String name:productNames){
+            counter++;
+            String id=""+counter;
+            this.productList.put(id,new Product(id,name));
+        }
+
     }
 
-    public ProductRepo(HashMap<String, Product> productList) {
-        this.productList = productList;
+    public void addProduct(Product product){
+        productList.put(product.getId(), product);
     }
 
-    @Override
-    public String toString() {
-        return "products:" + productList;
+    public Product getProductById(String id){
+        return productList.get(id);
     }
 
-    public Map<String, Product> getProductList() {
-        return productList;
+    public  String getProductsAsString(){
+        return this.productList.toString();
     }
 
-    public void setProductList(Map<String, Product> productList) {
-        this.productList = productList;
-    }
 
-    public void add(Product product) {
-        this.productList.put( product.getId(),product);
-    }
 }
