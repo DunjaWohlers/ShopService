@@ -2,18 +2,17 @@ import db.OrderRepo;
 import db.ProductRepo;
 import model.Order;
 import model.Product;
-
+import model.User;
+import service.ShopService;
 import java.util.Scanner;
-
 public class Main {
-
-
     public  static void main(String[] args) {
         ProductRepo repo = new ProductRepo();
         OrderRepo orders=new OrderRepo();
-        abfrage(repo,orders);
+        ShopService shopService= new ShopService(repo, orders);
+        registerUser(shopService);
+        abfrage(shopService);
     }
-
     private static void welcomeMessage(String user) {
         System.out.println("Willkommen, " + user);
         System.out.println("Bitte wähle eine der Optionen:");
@@ -22,38 +21,34 @@ public class Main {
         System.out.println("3 Benutzer wechseln");
         System.out.println("e exit");
     }
-
-    private  static void abfrage(ProductRepo repo, OrderRepo orders) {
-        System.out.println("Bitte gib deinen Benutzernamen an:");
-        String userName=scannerInput();
-
-        welcomeMessage(userName);
-       // ShopService service = new ShopService(repo, orderRepo);
+    private  static void abfrage(ShopService shopService) {
+        welcomeMessage(shopService.getUserName());
         String wahlInput = scannerInput();
-
         switch (wahlInput) {
-            case "1":
-                createProduct(repo);
-                abfrage(repo,orders);
-                break;
-            case "2":
+            case "1" -> {
+                createProduct(shopService);
+                abfrage(shopService);
+            }
+            case "2" -> {
                 System.out.println("Möchtest du die Waren deiner aktuellen Bestellung hinzufügen? y/n");
-                String input=scannerInput();
+                String input = scannerInput();
                 if (input.equals("y")) {
-                    if(orderIdCounter==0){
+                    if (orderIdCounter == 0) {
                         System.out.println("Du hast noch keine Bestellung ausgeführt, eine neue wird angelegt.");
-                        addProductToNewOrder(orders, repo,userName);
-                    }else {
-                        addProdouctToExistingOrder(orders, repo);
+                        addProductToNewOrder(shopService, shopService.getActualUser());
+                    } else {
+                        addProdouctToExistingOrder(shopService);
                     }
-                }else{
+                } else {
                     System.out.println("Die Waren werden einer neuen Bestellung hinzugefügt...");
-                    addProductToNewOrder(orders, repo,userName);
+                    addProductToNewOrder(shopService, shopService.getActualUser());
                 }
-                abfrage(repo,orders);
-                break;
-            default:
-                abfrage(repo,orders);
+                abfrage(shopService);
+            }
+            default -> {
+                registerUser(shopService);
+                abfrage(shopService);
+            }
         }
     }
 
@@ -62,39 +57,44 @@ public class Main {
         return scan.nextLine();
     }
 
-
-    static void createProduct(ProductRepo repo) {
+    static void createProduct(ShopService shopService) {
         System.out.println("Gib den Namen des Produktes ein:");
         String name = scannerInput();
         System.out.println("Gib die ID des Produktes ein:");
         String id = scannerInput();
-        repo.addProduct(new Product(id, name));
+        shopService.productRepo.addProduct(new Product(id, name));
     }
 
-    static void addProdouctToExistingOrder( OrderRepo orderDb, ProductRepo repo) {
-        System.out.println(repo.getProductsAsString());
+    static void addProdouctToExistingOrder( ShopService shopService) {
+        System.out.println(shopService.productRepo.getProductsAsString());
         String orderID=""+orderIdCounter;
         System.out.println("Gib die ID des gewünschten Produktes ein:");
         String id = scannerInput();
-        Product chosenProduct=repo.getProductById(id);
-        orderDb.addProductToExistingOrder(chosenProduct, orderID);
+        Product chosenProduct=shopService.productRepo.getProductById(id);
+        shopService.orderDB.addProductToExistingOrder(shopService.getActualUser(),chosenProduct, orderID);
     }
 
     static int orderIdCounter=0;
-    static void addProductToNewOrder(OrderRepo orderDb, ProductRepo repo, String user) {
+    static void addProductToNewOrder(ShopService shopService, User user) {
         orderIdCounter++;
-        System.out.println(repo.getProductsAsString());
+        System.out.println(shopService.productRepo.getProductsAsString());
         String orderID=""+orderIdCounter;
         System.out.println("Gib die ID des gewünschten Produktes ein:");
         String id = scannerInput();
-        System.out.println(repo.getProductById(id));
-        Product chosenProduct=repo.getProductById(id);
+        System.out.println(shopService.productRepo.getProductById(id));
+        Product chosenProduct=shopService.productRepo.getProductById(id);
         Order order=new Order(user,orderID, chosenProduct);
         System.out.println(order);
-        orderDb.addOrder(order);//Neuen Order erstellen
-        orderDb.addProductToExistingOrder(chosenProduct,orderID); //Product einfügen
-        System.out.println(orderDb.getOrdersAsString());
+        shopService.orderDB.addOrder(order, user);//Neuen Order erstellen
+        shopService.orderDB.addProductToExistingOrder(user,chosenProduct,orderID); //Product einfügen
+        System.out.println(shopService.orderDB.getOrdersAsString());
 
+    }
+
+    static void registerUser(ShopService shopService){
+        System.out.println("Bitte gib deinen Benutzernamen an:");
+        String userName=scannerInput();
+        shopService.setUser(userName);
     }
 
     }

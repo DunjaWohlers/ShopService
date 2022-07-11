@@ -2,33 +2,40 @@ package db;
 
 import model.Order;
 import model.Product;
+import model.User;
 
 import java.util.*;
 
 public class OrderRepo {
-    Map<String,Order> orders;
+    Map<String,Map<String,Order>> ordersUsers;
+
 
     public OrderRepo(){
-        this.orders = new HashMap<>();
+        this.ordersUsers = new HashMap<>() {
+        };
     }
 
     int idCounter=0;
-    public void addOrder(Order order){
+    public void addOrder(Order order, User user){
         //idCounter++;
         // id="OrderNr."+idCounter;
-        this.orders.put(order.getOrderID(), order);
+        boolean exists=false;
+        if(!this.ordersUsers.containsKey(user.getName().toLowerCase(Locale.ROOT))){
+            this.ordersUsers.put(user.getName().toLowerCase(Locale.ROOT),new HashMap<>());
+        }
+        this.ordersUsers.get(user.getName().toLowerCase(Locale.ROOT)).put(order.getOrderID(), order);
     }
 
 
 
-    public void addProductToExistingOrder(Product product, String orderID){
+    public void addProductToExistingOrder(User user, Product product, String orderID){
 
-        orders.get(orderID).addProduct(product);
+        ordersUsers.get(user.getName()).get(orderID).addProduct(product);
     }
 
 
     public  String getOrdersAsString(){
-        return this.orders.toString();
+        return this.ordersUsers.toString();
     }
 
 }

@@ -2,13 +2,33 @@ package service;
 
 import db.OrderRepo;
 import db.ProductRepo;
-import model.Order;
 import model.Product;
+import model.User;
 
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class ShopService {
+
+    public OrderRepo orderDB;
+    public ProductRepo productRepo;
+    public User actualUser;
+
+    public ShopService(ProductRepo productRepo, OrderRepo orderRepo){
+        this.productRepo=productRepo;
+        this.orderDB = orderRepo;
+    }
+
+    public void setUser(String userName){
+        actualUser=new User(userName);
+    }
+
+    public String getUserName(){
+        return this.actualUser.getName();
+    }
+
+    public User getActualUser(){
+        return this.actualUser;
+    }
+
 
 
 }

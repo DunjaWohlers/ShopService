@@ -9,10 +9,10 @@ public class Order {
     String orderID;
     Map<String, Product> productMap;
 
-    String user;
+    User user;
 
-    public Order(String userName, String id, Product product) {
-        this.user = userName;
+    public Order(User user, String id, Product product) {
+        this.user = user;
         this.orderID = id;
         this.productMap = new HashMap<>();
         addProduct(product);
